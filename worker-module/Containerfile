@@ -15,7 +15,7 @@ LABEL org.opencontainers.image.description="Demo job app - part 3/3 that contain
 # BUILD: section with commands to build the app
 RUN pip install redis
 COPY cpp-app/bin/calculator /home/app/ 
-COPY python-app/scripts/*.py /home/app/
+COPY python-app/src/*.py /home/app/
 
 
 # RUN: section that defines the app to be run
