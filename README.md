@@ -156,13 +156,13 @@ $ podman image push $C_REPO_PATH/jobs-queue:latest
 ### Building and testing the worker module
 1. From the worker-module root dir, build the container
 ```
-$ podman build -f Containerfile -t $C_REPO_PATH/jobs-worker:latest
-STEP 1/10: FROM ubi8/python-311
+$ $ podman build -f Containerfile -t $C_REPO_PATH/jobs-worker:latest
+[1/2] STEP 1/5: FROM ubi8 AS builder
 
 (OUTPUT SUPRESSED ...)
 
 Successfully tagged docker.io/username/jobs-worker:latest
-c066aba01368de96bcdee1776ecc4b67c6b7404076690bb8ee6926e84d9a0af2
+7c6142e156a14840e85d7bb4efb9ffba46dc0ae97a2c46befd3d5c14a2b710eb
 ```
 
 2. Push the image into your prefered container repo
