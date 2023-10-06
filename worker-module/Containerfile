@@ -3,9 +3,8 @@
 FROM ubi8 as builder
 
 USER root
-RUN yum -y install gcc make && mkdir -p /home/app/src /home/app/bin
-COPY cpp-app/* /home/app/
-RUN ls /home/app/src/
+RUN yum -y install gcc gcc-c++ make && mkdir -p /home/app/src /home/app/bin
+COPY ./cpp-app /home/app
 RUN (cd /home/app/ && make)
 
 
