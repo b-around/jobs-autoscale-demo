@@ -13,6 +13,15 @@ export C_REPO_USER=dockeruser
 # Set the container repository password
 export C_REPO_PASS=dockerpass
 
+# Set the Red Hat container repository
+export RH_REPO=registry.access.redhat.com
+
+# Set the Red Hat container repository username
+export RH_REPO_USER=rhniduser
+
+# Set the Red Hat container repository password
+export RH_REPO_PASS=rhniduserpass
+
 # Set the OpenShift project
 export OCP_API=api.clustername.clusterdomain.com:6443
 

@@ -18,10 +18,10 @@ Nothing identified, you tell me.
 
 ## GIT REPO OVERVIEW
 The high-level structure of the repository is:
-- an API module that receives a list of items to be processed and writes it to the queue
-- a queue module that consists of a redis server to store the queued items
-- a worker module that consists of a back-end app that processes the 
-
+- **api-module:** an API component that receives a list of items to be processed and writes it to the queue
+- **queue-module:** a queue componnent supported by a redis server that stores queued items
+- **worker-module:** a worker module that consists of a back-end app that reads items from the queue and processes them
+- **shared:** openshift and bash scripts that provide general funcionality or are used by multiple modules
 
 
 ## ENVIRONMENT SETUP AND INITIALIZATION
@@ -111,9 +111,9 @@ secret/my-dockerio-secret created
 $ podman login -u $C_REPO_USER -p $C_REPO_PASS $C_REPO
 ```
 
-2. Login to the redhat registry to get access to Red Hat base images
+2. Login to the redhat registry to get access to Red Hat ubi and redis images
 ```
-$ podman login -u <red-hat-portal-username> -p <red-hat-portal-password> regstry.redhat.io
+$ podman login -u $RH_REPO_USER -p $RH_REPO_PASS $RH_REPO
 ```
 
 

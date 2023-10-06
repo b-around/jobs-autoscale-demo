@@ -1,4 +1,15 @@
 # syntax=docker/dockerfile:1
+## Builder container specification - used just to compile cpp code
+FROM ubi8 as builder
+
+USER root
+RUN yum -y install gcc make && mkdir -p /home/app/src /home/app/bin
+COPY cpp-app/* /home/app/
+RUN ls /home/app/src/
+RUN (cd /home/app/ && make)
+
+
+## Final application container specification
 FROM ubi8/python-311
 
 LABEL org.opencontainers.image.version=0.1
@@ -14,7 +25,7 @@ LABEL org.opencontainers.image.description="Demo job app - part 3/3 that contain
 
 # BUILD: section with commands to build the app
 RUN pip install redis
-COPY cpp-app/bin/calculator /home/app/ 
+COPY --from=builder /home/app/bin/calculator /home/app/ 
 COPY python-app/src/*.py /home/app/
 
 
