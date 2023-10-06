@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-queue
+  labels:
+    app: redis
+    role: leader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: leader
+    spec:
+      imagePullSecrets:
+      - name: my-dockerio-secret
+      containers:
+      - name: jobs-queue
+        image: docker.io/azenhab/jobs-queue:latest  # REMINDER update to relevant image repo
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+        ports:
+        - containerPort: 6379
+        command: ["redis-server"] 
+        args: ["--bind", "0.0.0.0", "--requirepass", "3R8P8reeQVqTrwGT", "--loglevel", "debug", "--save", " "]  # REMINDER remove --loglevel arg and configure snapshots when running in PROD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-svc
+  labels:
+    app: redis
+    role: leader
+spec:
+  selector:
+    app: redis
+    role: leader
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP
+
+
+

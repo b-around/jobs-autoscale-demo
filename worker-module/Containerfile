@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM ubi8/python-311
+
+LABEL org.opencontainers.image.version=0.1
+LABEL org.opencontainers.image.title="OCP jobs demo - worker app"
+LABEL org.opencontainers.image.description="Demo job app - part 3/3 that contains python and cpp apps to run as OCP jobs"
+
+
+# DEBUG ONLY: the next block is required for dev/debug activities only and should be removed
+# USER root
+# RUN yum -y install net-tools iputils
+# USER 10001
+
+
+# BUILD: section with commands to build the app
+RUN pip install redis
+COPY cpp-app/bin/calculator /home/app/ 
+COPY python-app/scripts/*.py /home/app/
+
+
+# RUN: section that defines the app to be run
+WORKDIR /home/app/
+CMD ["python3", "worker.py"]
+

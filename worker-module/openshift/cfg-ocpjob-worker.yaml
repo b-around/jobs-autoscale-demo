@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: worker-job
+spec:
+  template:
+    metadata:
+      name: worker-job
+    spec:
+      imagePullSecrets:
+        - name: my-dockerio-credentials
+      containers:
+        - name: worker
+          image: 'docker.io/azenhab/tasks-worker:latest'
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+          resources: {}
+          env:
+            - name: APP_DEBUG
+              value: 'True'
+            - name: REDIS_URL
+              value: redis-srv
+            - name: REDIS_PORT
+              value: '6379'
+            - name: REDIS_PWD
+              value: 3R8P8reeQVqTrwGT
+      restartPolicy: OnFailure
+  activeDeadlineSeconds: 7200      # TODO update maximum amount of time a job can run
+  parallelism: 3                   # TODO define max number of containers to run when job is first configured.
+  backoffLimit: 2                  # TODO update with max retries if a container fails when restart policy is OnFailure

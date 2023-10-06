@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs-api
+  labels:
+    app: jobs-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jobs-api
+  template:
+    metadata:
+      labels:
+        app: jobs-api
+    spec:
+      imagePullSecrets:
+      - name: my-dockerio-secret
+      containers:
+      - name: jobs-api
+        image: docker.io/azenhab/jobs-api:latest          # REMINDER update to relevant image repo
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop:
+            - ALL
+        resources: {}
+        envFrom:
+        - configMapRef:
+            name: my-configmap
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobs-api-svc
+  labels:
+    app: jobs-api
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: jobs-api
+
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: jobs-api
+  labels:
+    app: jobs-api
+spec:
+  port:
+    targetPort: 5000
+  to:
+    kind: Service
+    name: jobs-api-svc
+    weight: 100
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+

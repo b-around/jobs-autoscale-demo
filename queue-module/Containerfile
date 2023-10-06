@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1
+FROM rhel8/redis-6
+
+LABEL org.opencontainers.image.version=0.1
+LABEL org.opencontainers.image.title="jobs autoscaler demo - queue app"
+LABEL org.opencontainers.image.description="Demo app - module 2/3 that contains a tasks queue"
+
+
+# DEBUG ONLY: the next block is required for dev/debug activities only and should be left commented by default
+# USER root
+# RUN yum -y install net-tools iputils
+# USER 10001

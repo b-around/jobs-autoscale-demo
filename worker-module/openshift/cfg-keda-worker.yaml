@@ -1,0 +1,64 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-trigger-auth-redis-secret
+spec:
+  secretTargetRef:
+    - parameter: password
+      name: redis-secret
+      key: REDIS_PASSWORD   
+
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: jobs-worker
+spec:
+  failedJobsHistoryLimit: 10
+  successfulJobsHistoryLimit: 10
+  jobTargetRef:
+    template:
+      spec:
+        imagePullSecrets:
+        - name: my-dockerio-secret
+        containers:
+          - name: worker 
+            image: 'docker.io/azenhab/jobs-worker:latest'            # REMINDER update to relevant image repo
+            imagePullPolicy: Always	
+            env:
+              - name: APP_DEBUG
+                value: 'True'
+              - name: REDIS_URL
+                valueFrom:
+                   configMapKeyRef:
+                      name: my-configmap
+                      key: REDIS_URL
+              - name: REDIS_PORT
+                valueFrom:
+                   configMapKeyRef:
+                      name: my-configmap
+                      key: REDIS_PORT
+              - name: REDIS_PWD
+                valueFrom:
+                   secretKeyRef:
+                      name: redis-secret
+                      key: REDIS_PASSWORD
+            resources: {}
+        restartPolicy: OnFailure
+  maxReplicaCount: 10
+  pollingInterval: 30
+  rollout: {}
+  scalingStrategy: {}
+  triggers:
+    - type: redis
+      authenticationRef:
+        name: keda-trigger-auth-redis-secret
+      metadata:
+        address: 'redis-svc.jobs-demo:6379'
+        listLength: '1'                       # TODO update with number of elements to trigger autoscaling
+        listName: default                     # TODO update with list to be monitored
+        enableTLS: 'false'
+
+
+
