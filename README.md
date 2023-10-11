@@ -93,7 +93,7 @@ $ oc new-project $OCP_PROJECT
 Note that in some environments the base64 encoded result may be split into two lines.
 When using the output, make sure this is used as a single line.
 ```
-$ echo -n {"auths": {"docker.io": {"username": "<username>", "password": "<password>"}}} | base64
+$ echo -n {"auths": {"docker.io": {"username": "$C_REPO_USER", "password": "$C_REPO_PASS"}}} | base64
 
 e2F1dGhzOiB7ZG9ja2VyLmlvOiB7dXNlcm5hbWU6IDx1c2VybmFtZT4sIHBhc3N3b3JkOiA8cGFz
 c3dvcmQ+fX19
@@ -101,7 +101,7 @@ c3dvcmQ+fX19
 
 2. Generate your redis password in base64 format.
 ```
-$ echo -n 3R8P8reeQVqTrwGT | base64
+$ echo -n $REDIS_PWD | base64
 
 M1I4UDhyZWVRVnFUcndHVA==
 ```
