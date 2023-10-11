@@ -7,7 +7,7 @@
 
 using namespace std;
  
-// Function for finding prime number in given range
+// Function for finding prime numbers in given range
 void primeInRange(int L, int R)
 {
     int flag;
@@ -40,7 +40,24 @@ void primeInRange(int L, int R)
             cout << i << " ";
     }
 }
+
+// Function for finding fibonacci numbers in given range
+void FibonacciSequence(int L, int R)
+{
+int a = 0, b = 1, c = 0;
+    while (c <= R) {
+        if (c >= L) {
+            std::cout << c << " ";
+        }
+        c = a + b;
+        a = b;
+        b = c;
+    }
+}
  
+
+
+
 // Entrypoint
 int main(int argc, char *argv[])
 {
@@ -59,6 +76,15 @@ int main(int argc, char *argv[])
     	primeInRange(L, R);
  
     	printf("\n*** PRIME CALCULATION COMPLETE ***\n\n");
+
+    }else if (argc == 4 && function =="prime" ){
+      	printf("\n*** CALCULATING FIBONACCI NUMBERS BETWEEN %d AND %d **\n" , L , R);
+
+    	// Prime function Call
+    	FibonacciSequence(L, R);
+ 
+    	printf("\n*** FIBONACCI CALCULATION COMPLETE ***\n\n");
+
     } else {
         printf("\nFunction not defined and task will be ignored...\n\n");
     }
