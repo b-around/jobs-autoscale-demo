@@ -65,7 +65,7 @@ $ source shared/env-setup.sh
 
 3. Login to your Openshift cluster
 ```
-$ oc login --server $OCP_API -u $OCP_USER  -p $OCP_PASS
+$ oc login --server $OCP_API -u $OCP_USER -p $OCP_PASS
 ```
 
 4. Add the Helm repo for keda
@@ -271,7 +271,7 @@ $ podman build -f Containerfile -t $C_REPO_PATH/jobs-worker:latest
 [3/3] STEP 9/9: CMD ["python3", "worker.py"]
 [3/3] COMMIT docker.io/username/jobs-worker:latest
 --> e20525d3b16
-Successfully tagged docker.io/azenhab/jobs-worker:latest
+Successfully tagged docker.io/username/jobs-worker:latest
 e20525d3b16b5eb5dd2070ddccc70e2b3fb49000fd87a73ebea1c34bc4c7fba2
 ```
 
@@ -364,9 +364,9 @@ Once all tasks are processed and the queue empty, the container will gracefully 
 $ watch podman ps
 
 CONTAINER ID  IMAGE                                 COMMAND               CREATED         STATUS         PORTS                   NAMES
-e4adf927e98e  docker.io/azenhab/jobs-api:latest     python3 tasks-api...  2 hours ago     Up 2 hours     0.0.0.0:5000->5000/tcp  api-app
-0d70013eec6c  docker.io/azenhab/jobs-queue:latest   redis-server --bi...  2 hours ago     Up 2 hours                             queue-app
-41f052d756cb  docker.io/azenhab/jobs-worker:latest  python3 worker.py     33 seconds ago  Up 33 seconds                          worker-app
+e4adf927e98e  docker.io/username/jobs-api:latest     python3 tasks-api...  2 hours ago     Up 2 hours     0.0.0.0:5000->5000/tcp  api-app
+0d70013eec6c  docker.io/username/jobs-queue:latest   redis-server --bi...  2 hours ago     Up 2 hours                             queue-app
+41f052d756cb  docker.io/username/jobs-worker:latest  python3 worker.py     33 seconds ago  Up 33 seconds                          worker-app
 ```
 
 
@@ -508,6 +508,6 @@ jobs-worker-vwbck   1/1           38s        2m8s
 jobs-worker-w2z47   1/1           38s        2m8s
 ```
 
-
+10. Inspect the logs for each pod associated with the completed jobs to see the outputs of the prme or fibonacci calculations
 
 
