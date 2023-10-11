@@ -291,9 +291,9 @@ $ podman run -itd --name api-app \
   --network demo-net \
   -e APP_DEBUG=True \
   -e API_TOKEN=True \
-  -e API_TOKEN_VALUE=96w9EXfen2zEJxcd \
+  -e API_TOKEN_VALUE=$API_TOKEN \
   -e REDIS_URL=queue-app \
-  -e REDIS_PWD=3R8P8reeQVqTrwGT \
+  -e REDIS_PWD=$REDIS_PWD \
   -p 5000:5000 \
   $C_REPO_PATH/jobs-api:latest
 ```
@@ -303,20 +303,20 @@ $ podman run -itd --name api-app \
 $ podman run -d --name queue-app \
   --network demo-net \
   $C_REPO_PATH/jobs-queue:latest \
-  redis-server --bind 0.0.0.0 --loglevel debug --requirepass 3R8P8reeQVqTrwGT --save ""
+  redis-server --bind 0.0.0.0 --loglevel debug --requirepass $REDIS_PWD --save ""
 ```
 
 
 3. Populate the queue with a couple of tasks. 
 When using a HTTP GET, the API self generates test data.
 ```
-$ curl -H "Authorization: APIKey 96w9EXfen2zEJxcd" \
+$ curl -H "Authorization: APIKey $API_TOKEN" \
    --insecure http://127.0.0.1:5000
 ```
 
 4. Check the data is written to the queue
 ```
-$ podman exec queue-app redis-cli -a 3R8P8reeQVqTrwGT LRANGE default 0 -1
+$ podman exec queue-app redis-cli -a $REDIS_PWD LRANGE default 0 -1
 
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 prime 100 150
@@ -327,14 +327,14 @@ finbonnaci 100 1111
 
 5. Populate the queue with additional tasks provided via HTTP POST
 ```
-$ curl -X POST -H "Authorization: APIKey 96w9EXfen2zEJxcd" -H "Content-Type: application/json" \
+$ curl -X POST -H "Authorization: APIKey $API_TOKEN" -H "Content-Type: application/json" \
    -d ' {"tasks": ["prime 1200 1300", "prime 2222 3455", "fibonacci 999 5000", "prime 10 555"]} ' \
    --insecure http://127.0.0.1:5000
 ```
 
 6. Check the additional data is written to the queue
 ```
-$ podman exec queue-app redis-cli -a 3R8P8reeQVqTrwGT LRANGE default 0 -1
+$ podman exec queue-app redis-cli -a $REDIS_PWD LRANGE default 0 -1
 
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 prime 100 150
@@ -353,7 +353,7 @@ $ podman run -d --name worker-app \
   --network demo-net \
   -e APP_DEBUG=True \
   -e REDIS_URL=queue-app \
-  -e REDIS_PWD=3R8P8reeQVqTrwGT \
+  -e REDIS_PWD=$REDIS_PWD \
   $C_REPO_PATH/jobs-worker:latest
 ```
 
@@ -413,7 +413,7 @@ route.route.openshift.io/jobs-api created
 
 3. Call the api via GET method to automatically generate test data
 ```
-$ curl -si -H "Authorization: APIKey 96w9EXfen2zEJxcd" --insecure https://$API_URL
+$ curl -si -H "Authorization: APIKey $API_TOKEN" --insecure https://$API_URL
 
 HTTP/1.1 200 OK
 server: Werkzeug/3.0.0 Python/3.11.2
@@ -431,7 +431,7 @@ cache-control: private
 
 4. Connect to the redis server via ocp service to verify that the items exist in the list
 ```
-$ oc rsh svc/redis-svc redis-cli -a 3R8P8reeQVqTrwGT LRANGE default 0 -1
+$ oc rsh svc/redis-svc redis-cli -a $REDIS_PWD LRANGE default 0 -1
 
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 1) "prime 100 150"
@@ -442,7 +442,7 @@ Warning: Using a password with '-a' or '-u' option on the command line interface
 
 5. Call the api via POST method to send your own custom data
 ```
-$ curl -si -X POST -H "Authorization: APIKey 96w9EXfen2zEJxcd" -H "Content-Type: application/json" \
+$ curl -si -X POST -H "Authorization: APIKey $API_TOKEN" -H "Content-Type: application/json" \
   -d '{  "tasks": ["prime 1200 1300", "prime 2222 3455", "prime 4123 5000"]}' \
   --insecure https://$API_URL
 

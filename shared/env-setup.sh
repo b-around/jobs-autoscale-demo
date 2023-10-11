@@ -38,4 +38,7 @@ export OCP_PROJECT=jobs-demo
 export API_URL=jobs-api-jobs-demo.apps.clustername.clusterdomain.com
 
 # Set the api app name
+export API_TOKEN=96w9EXfen2zEJxcd
+
+# Set the api app name
 export REDIS_PWD=3R8P8reeQVqTrwGT
