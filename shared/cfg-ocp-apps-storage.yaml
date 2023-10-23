@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jobs-pv
+spec:
+  capacity:
+    storage: 30Gi
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: 'fs-0cb50d10b35837825::fsap-0ace06b819ccb8273'    # REMINDER replace with relevant AWS fs id and fsap id (available via AWS console)
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: aws-efs
+  volumeMode: Filesystem
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jobs-vol-claim
+spec:
+  storageClassName: aws-efs
+  volumeName: jobs-pv        # REMINDER enter the name of the PV used to service this storage claim
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi 

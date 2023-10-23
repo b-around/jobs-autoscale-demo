@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: test-pv
+spec:
+  capacity:
+    storage: 10Gi
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: 'fs-0cb50d10b35837825:/Simudyne'    # REMINDER replace with relevant AWS fs id and fsap id (available via AWS console)
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: aws-efs
+  volumeMode: Filesystem
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-claim
+spec:
+  storageClassName: aws-efs
+  volumeName: test-pv        # REMINDER enter the name of the PV used to service this storage claim
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi 
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: my-container
+      image: busybox:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+        capabilities:
+          drop:
+           - ALL
+      volumeMounts:
+      - name: my-efs
+        mountPath: /app-efs
+      command:
+        - sleep
+        - "3600"
+  volumes:
+    - name: my-efs
+      persistentVolumeClaim:
+        claimName: test-claim
+  restartPolicy: Always
+
+
