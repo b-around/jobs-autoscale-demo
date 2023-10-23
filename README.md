@@ -1,7 +1,7 @@
 # jobs-autoscale-demo
 ## PROJECT OVERVIEW
 This project demonstrates how to set up KEDA to manage autoscaling for kubernetes jobs that will process tasks from a Redis list that acts as a FIFO queue.
-It consists of a front-end api that creates a list of mathematical caulations tasks, a redis server to act as a queue for the tasts and a worker app that processes the tasks.
+It consists of a front-end api that creates a list of mathematical calculations tasks, a redis server to act as a queue for the tasts and a worker app that processes the tasks.
 The application can handle two types of tasks: 
 i)calulating the prime numbers for any given start number and end number range
 ii)calulating the fibonacci sequence numbers for any given start number and end number range
@@ -23,16 +23,16 @@ Fully functional.
 
 
 ## NOT WORKING/NOT TESTED
-- Future update will also include an option to save the ouptut to extenral persistent storage
+- Future update will include an option to save outputs onto persistent storage
 
 
 
 ## GIT REPO OVERVIEW
 The high-level structure of the repository is:
 - **api-module:** an API component that receives a list of items to be processed and writes it to the queue
-- **queue-module:** a queue componnent supported by a redis server that stores queued items
+- **queue-module:** a queue component supported by a redis server that stores queued items
 - **worker-module:** a worker module that consists of a back-end app that reads items from the queue and processes them
-- **shared:** openshift and bash scripts that provide general funcionality or are used by multiple modules
+- **shared:** OpenShift and bash scripts that provide general functionality or are used by multiple modules
 
 
 ## ENVIRONMENT SETUP AND INITIALIZATION
@@ -50,12 +50,15 @@ Please ensure your environment is using one of the tested setups before reportin
 
 
 ### Pre-requisites
-1. Ensure all tools have been installed accordingly to the tested setups. Keda instructions are provded below and for the remaining tools follow the usual steps.
+1. Ensure all tools have been installed accordingly to the tested setups. Keda instructions are provided below and for the remaining tools follow the usual steps.
 
-2. Ensure you have a docker.io registry, quay.io registry or equivelent registry account to store your container images
+2. Ensure you have a docker.io registry, quay.io registry or equivalent registry account to store your container images
 
 
 ### Keda initial setup
+The steps detailed in this section should only be executed ONCE per new cluster.
+The instructions are referring to an explicit version of keda to avoid unintentional version upgrades in the event of accidentally running these instructions multiple times.
+
 1. Review the **app-env-setup.sh** file located in the project root folder file and update the environment variables to match your needs
 
 2. From the project root dir, load environment variables
@@ -84,7 +87,9 @@ $ helm install keda kedacore/keda --namespace keda --create-namespace --version 
 ```
 
 ### OCP initial setup
-1. Create the openshift project to host this demo
+The steps detailed in this section should only be executed ONCE per new project.
+
+1. Create the OpenShift project to host this demo
 ```
 $ oc new-project $OCP_PROJECT
 ```
@@ -118,15 +123,23 @@ secret/redis-secret created
 secret/my-dockerio-secret created
 ```
 
+5. Create the persistent volume and claim to allow pods using persistent storage
+```
+$ oc apply -f shared/cfg-ocp-apps-storage.yaml 
+
+persistentvolume/jobs-pv created
+persistentvolumeclaim/jobs-vol-claim created
+```
+
 
 
 ### (OPTIONAL) Podman initial setup
-To test this application in a local developer machine and using podman, follow the isntructions below.
-These steps are requred when working on a fresh podman installation that only has a default network.
-The default podman network does not allow container name resolution and limits inter-container connectivity.
+To test this application in a local developer machine and using podman, follow the instructions below.
+The default podman network does not allow container name resolution and limits inter-container connectivity. Therefore, some additional plugins need to be installed.
+These steps should only be executed ONCE per developer machine and when using a fresh podman installation that only has a default network.
 
 1. Check have a custom podman network with DNS resolution active.
-On a fresh installtion you will only have the default 'podman' network and without dns enabled.
+On a fresh installation you will only have the default 'podman' network and without dns enabled.
 ```
 $ podman network ls
 
@@ -283,7 +296,7 @@ $ podman image push $C_REPO_PATH/jobs-worker:latest
 
 
 ### (OPTIONAL) Testing all modules locally
-Follow the steps beow if you want to test the app locally on a developer machine using podman and prior to deploying into an OpenShift cluster
+Follow the steps below if you want to test the app locally on a developer machine using podman and prior to deploying into an OpenShift cluster
 
 1. Start up the api module attached to the podman demo-net network
 ```
@@ -295,6 +308,7 @@ $ podman run -itd --name api-app \
   -e REDIS_URL=queue-app \
   -e REDIS_PWD=$REDIS_PWD \
   -p 5000:5000 \
+  --volume /home/user/local/path:/container/path:z \
   $C_REPO_PATH/jobs-api:latest
 ```
 
@@ -354,11 +368,12 @@ $ podman run -d --name worker-app \
   -e APP_DEBUG=True \
   -e REDIS_URL=queue-app \
   -e REDIS_PWD=$REDIS_PWD \
+  --volume /home/user/local/path:/container/path:z \
   $C_REPO_PATH/jobs-worker:latest
 ```
 
 8. Run a watcher on the container processes and wait until the worker-app container finishes.
-Note that the worker app has a built-in funcion to delay/sleep 30 seconds between each processed task to simulate computational complexity.
+Note that the worker app has a built-in function to delay/sleep 30 seconds between each processed task to simulate computational complexity.
 Once all tasks are processed and the queue empty, the container will gracefully exit. Hit CTRL-Z to exit the watcher.
 ```
 $ watch podman ps
@@ -396,7 +411,7 @@ DEBUG:root:Finished processing all allocted tasks. Now exiting...
 
 1. From the project root dir, deploy the queue-app into OCP via YAML config file
 ```
-$ oc apply -f jobs-module/openshift/cfg-queue.yaml
+$ oc apply -f queue-module/openshift/cfg-queue.yaml
 
 deployment.apps/redis-queue created
 service/redis-svc created
@@ -508,6 +523,6 @@ jobs-worker-vwbck   1/1           38s        2m8s
 jobs-worker-w2z47   1/1           38s        2m8s
 ```
 
-10. Inspect the logs for each pod associated with the completed jobs to see the outputs of the prme or fibonacci calculations
+10. Inspect the logs for each pod associated with the completed jobs to see the outputs of the prime or Fibonacci calculations
 
 

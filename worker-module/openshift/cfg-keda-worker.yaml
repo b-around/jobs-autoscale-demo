@@ -1,3 +1,4 @@
+---
 apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
 metadata:
@@ -7,7 +8,6 @@ spec:
     - parameter: password
       name: redis-secret
       key: REDIS_PASSWORD   
-
 
 ---
 apiVersion: keda.sh/v1alpha1
@@ -22,10 +22,17 @@ spec:
       spec:
         imagePullSecrets:
         - name: my-dockerio-secret
+        volumes:
+        - name: app-storage
+          persistentVolumeClaim:
+            claimName: jobs-vol-claim           # REMINDER make sure it matches a valid PVC name
         containers:
           - name: worker 
             image: 'docker.io/azenhab/jobs-worker:latest'            # REMINDER update to relevant image repo
-            imagePullPolicy: Always	
+            imagePullPolicy: Always
+            volumeMounts:
+              - name: app-storage             # REMINDER make sure it matches the volume name defined in volumes section
+                mountPath: /app-data   	         # REMINDER update to relevant container path
             env:
               - name: APP_DEBUG
                 value: 'True'
@@ -59,6 +66,8 @@ spec:
         listLength: '1'                       # TODO update with number of elements to trigger autoscaling
         listName: default                     # TODO update with list to be monitored
         enableTLS: 'false'
+
+
 
 
 

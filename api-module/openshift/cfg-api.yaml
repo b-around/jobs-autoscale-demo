@@ -17,6 +17,10 @@ spec:
     spec:
       imagePullSecrets:
       - name: my-dockerio-secret
+      volumes:
+        - name: app-storage
+          persistentVolumeClaim:
+            claimName: jobs-vol-claim           # REMINDER make sure it matches a valid PVC name
       containers:
       - name: jobs-api
         image: docker.io/azenhab/jobs-api:latest          # REMINDER update to relevant image repo
@@ -29,6 +33,9 @@ spec:
           capabilities:
             drop:
             - ALL
+        volumeMounts:
+          - name: app-storage              # REMINDER make sure it matches the volume name defined in volumes section
+            mountPath: /app-data           # REMINDER update to relevant container path
         resources: {}
         envFrom:
         - configMapRef:
