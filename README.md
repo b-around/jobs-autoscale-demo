@@ -527,7 +527,7 @@ jobs-worker-w2z47   1/1           38s        2m8s
 10. Inspect the logs for each pod associated with the completed jobs to see the outputs of the prime or Fibonacci calculations
 
 
-## OPTION 1 - PACKAGING, DEPLOYING AND RUNNING THE APPLICATION VIA HELM CHART
+## OPTION 2 - PACKAGING, DEPLOYING AND RUNNING THE APPLICATION VIA HELM CHART
 Follow the steps below to use helm to automate deployment of this apllication components
 
 1. Check you are using the correct project namespace
