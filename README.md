@@ -407,7 +407,8 @@ DEBUG:root:Finished processing all allocted tasks. Now exiting...
 
 
 
-## DEPLOYING AND RUNNING THE APPLICATION
+## OPTION 1 - DEPLOYING AND RUNNING THE APPLICATION VIA MANUAL YAML DEPLOYMENT
+Follow the steps below to manually deploy each component of the application by using YAML config files
 
 1. From the project root dir, deploy the queue-app into OCP via YAML config file
 ```
@@ -524,5 +525,36 @@ jobs-worker-w2z47   1/1           38s        2m8s
 ```
 
 10. Inspect the logs for each pod associated with the completed jobs to see the outputs of the prime or Fibonacci calculations
+
+
+## OPTION 1 - PACKAGING, DEPLOYING AND RUNNING THE APPLICATION VIA HELM CHART
+Follow the steps below to use helm to automate deployment of this apllication components
+
+1. Check you are using the correct project namespace
+```
+$ echo current_project is: $(oc config view --minify=true -o jsonpath='{.contexts[*].context.namespace}')
+```
+
+2. Go through the helm chart folder located under ./jobschart and review all values.yaml files and yaml template files
+Update content as needed case the default values are not fir for pourpose
+
+3. From the project root directory run a chart validation
+```
+$ helm install myapp ./jobschart --dry-run --debug --namespace $OCP_PROJECT
+```
+
+4. If the step above succeeded, proceed to install the app
+All resources will be prefixed with the chosen release name 'myapp' in the exmaple below
+```
+$ helm install myapp ./jobschart --debug --namespace $OCP_PROJECT
+```
+
+5. If you want to share the helm cart you can package it using the command below
+Distribute the tgz file along with the container images
+```
+$ helm package ./jobschart
+
+Successfully packaged chart and saved it to: /home/admin/workspace/jobs-autoscale-demo/jobschart-0.2.0.tgz
+```
 
 

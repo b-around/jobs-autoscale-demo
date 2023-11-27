@@ -1,0 +1,82 @@
+# Default values for queuechart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+# Define if extra debug information should be generated
+# Valid values are 'True | False'
+debug: False
+
+
+# Define redis internal logging level
+# Valid values are:
+# debug (a lot of information, useful for development/testing)
+# verbose (many rarely useful info, but not a mess like the debug level)
+# notice (moderately verbose, what you want in production probably)
+# warning (only very important / critical messages are logged)
+loglevel: debug
+
+
+image:
+  repository: docker.io/azenhab/queue-api
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+
+# Define security context settings at the pod level
+podSecurityContext: {}
+  # fsGroup: 2000
+
+
+# Define security context settings at the container level
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+    - ALL
+
+
+# Define persistent data stores for containers
+# Uses PVCs from parent chart
+volumes: {}
+
+
+# Define tasks queue service configurations
+queueService:
+  type: ClusterIP
+  svcName: queue-svc
+  port: 6379
+
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Default resources request
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 1000m
+  #   memory: 1Gi
+
+podAnnotations: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,82 @@
+{{- $relname := .Release.Name }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "apichart.fullname" . }}
+  labels:
+    {{- include "apichart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "apichart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "apichart.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+         - name: {{ $relname }}-registry-secret
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- range .Values.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ $relname }}-appdata-pvc
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+          {{- range .Values.volumes }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+          {{- end }}
+          env:
+            - name: APP_DEBUG
+              value: '{{ .Values.debug }}'
+            - name: API_TOKEN
+              value: '{{ .Values.useAPIToken }}'
+            - name: API_TOKEN_VALUE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-api-secret
+                  key: API_TOKEN_VALUE
+            - name: REDIS_URL
+              value: '{{ .Values.queueService.svcName }}.{{ .Release.Namespace }}'   # REMINDER update this URL construct if moving redis queue to another namespace
+            - name: REDIS_PORT
+              value: '{{ .Values.queueService.port }}'
+            - name: REDIS_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-queue-secret
+                  key: REDIS_PASSWORD
+          ports:
+            - name: api
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+

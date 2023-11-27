@@ -1,0 +1,98 @@
+# Default values for apichart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+# Define if extra debug information should be generated
+# Valid values are 'True | False'
+debug: False
+
+
+# Define if api should use header token to control access
+useAPIToken: True
+
+
+image:
+  repository: docker.io/azenhab/jobs-api
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+
+# Define security context settings at the pod level
+podSecurityContext: {}
+  # fsGroup: 2000
+
+
+# Define security context settings at the container level
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+    - ALL
+
+
+# Define persistent data stores for containers
+# Uses PVCs from parent chart
+volumes:
+  - name: app-storage
+    mountPath: /app-data
+
+
+# Define cluster service access point configurations
+service:
+  type: ClusterIP
+  port: 5000
+
+
+# Define external access route configurations
+route:
+  # Specifies whether an ingress route should be created
+  enabled: true
+  wildcardPolicy: None
+  weight: 100
+  tls:
+    # -- Whether to secure the Route with TLS.
+    enabled: true
+    # -- TLS termination of the route.
+    termination: edge
+    # -- What to do with non-HTTPS traffic (usually port 80).
+    insecureEdgeTerminationPolicy: Redirect
+    # -- Certificate private key in PEM format.
+    key: ""
+    # -- Certificate in PEM format.
+    certificate: ""
+    # -- CA (chain) of the certificate in PEM format.
+    caCertificate: ""
+    # -- CA of the backend in PEM format. Only relevant when `termination=reencrypt`.
+    destinationCACertificate: ""
+
+
+# Define tasks queue service configurations
+queueService:
+  svcName: queue-svc
+  port: 6379
+
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+podAnnotations: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

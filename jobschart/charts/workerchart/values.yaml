@@ -1,0 +1,64 @@
+# Default values for workerchart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Define if extra debug information should be generated
+# Valid values are 'True | False'
+debug: False
+
+
+# Define the image repository
+image:
+  repository: docker.io/azenhab/queue-api
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+
+# Define security context settings at the pod level
+podSecurityContext: {}
+  # fsGroup: 2000
+
+
+# Define security context settings at the container level
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+    - ALL
+
+
+# Define persistent data stores for containers
+# Uses PVCs from parent chart
+volumes:
+  - name: app-storage
+    mountPath: /app-data
+
+
+# Define tasks queue service configurations
+queueService:
+  svcName: queue-svc
+  port: 6379
+
+
+# Define Keda autoscaler configurations
+keda:
+  failedJobsHistoryLimit: 10
+  successfulJobsHistoryLimit: 5
+  maxReplicaCount: 10
+  pollingInterval: 30
+  trigger:
+    listLength: 1
+    listName: default  
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

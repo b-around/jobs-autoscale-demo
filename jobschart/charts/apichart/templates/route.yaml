@@ -1,0 +1,54 @@
+{{- if .Values.route.enabled -}}
+{{- $relname := .Release.Name }}
+{{- $fullName := include "apichart.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ $relname }}-api
+  labels:
+{{ include "apichart.labels" . | indent 4 }}
+  {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  port:
+    targetPort: {{ .Values.service.port }}
+  to:
+    kind: Service
+    name: {{ include "apichart.fullname" . }}-svc
+    weight: {{ .Values.route.weight }}
+  wildcardPolicy: {{ .Values.route.wildcardPolicy }}
+{{- if .Values.route.tls.enabled }}
+  tls:
+{{- with .Values.route.tls }}
+    termination: {{ .termination }}
+    insecureEdgeTerminationPolicy: {{ .insecureEdgeTerminationPolicy }}
+    {{- with .key }}
+    key: |
+{{ . | indent 6 }}
+    {{- end }}
+    {{- with .certificate }}
+    certificate: |
+{{ . | indent 6 }}
+    {{- end }}
+    {{- with .caCertificate }}
+    caCertificate: |
+{{ . | nindent 6 }}
+    {{- end }}
+    {{- with .destinationCACertificate }}
+    destinationCACertificate: |
+{{ . | nindent 6 }}
+    {{- end }}
+{{- end}}
+{{- end }}
+
+
+
+
+{{- end }}

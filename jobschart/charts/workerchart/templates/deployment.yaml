@@ -1,0 +1,68 @@
+{{- $relname := .Release.Name }}
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "workerchart.fullname" . }}-redis-trigger-auth
+spec:
+  secretTargetRef:
+    - parameter: password
+      name: {{ .Release.Name }}-queue-secret
+      key: REDIS_PASSWORD   
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: {{ include "workerchart.fullname" . }}
+  labels:
+    {{- include "workerchart.labels" . | nindent 4 }}
+spec:
+  failedJobsHistoryLimit: {{ .Values.keda.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.keda.successfulJobsHistoryLimit }}
+  jobTargetRef:
+    template:
+      spec:
+        imagePullSecrets:
+         - name: {{ $relname }}-registry-secret
+        volumes:
+        {{- range .Values.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ $relname }}-appdata-pvc
+        {{- end }}
+        containers:
+          - name: worker 
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            volumeMounts:
+            {{- range .Values.volumes }}
+              - name: {{ .name }}
+                mountPath: {{ .mountPath }}
+            {{- end }}
+            env:
+              - name: APP_DEBUG
+                value: '{{ .Values.debug }}'
+              - name: REDIS_URL
+                value: '{{ .Values.queueService.svcName }}.{{ .Release.Namespace }}'   # REMINDER update this URL construct if moving redis queue to another namespace
+              - name: REDIS_PORT
+                value: '{{ .Values.queueService.port }}'
+              - name: REDIS_PWD
+                valueFrom:
+                   secretKeyRef:
+                      name: {{ .Release.Name }}-queue-secret
+                      key: REDIS_PASSWORD
+        restartPolicy: OnFailure
+  maxReplicaCount: 10
+  pollingInterval: 30
+  triggers:
+    - type: redis
+      authenticationRef:
+        name: {{ include "workerchart.fullname" . }}-redis-trigger-auth
+      metadata:
+        address: '{{ .Values.queueService.svcName }}.{{ .Release.Namespace }}:{{ .Values.queueService.port }}'
+        listLength: '{{ .Values.keda.trigger.listLength }}'
+        listName: {{ .Values.keda.trigger.listName }}
+        enableTLS: 'false'
+

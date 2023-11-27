@@ -27,3 +27,4 @@ metadata:
 type: docker-registry
 data:
   .dockerconfigjson: e2F1dGhzOiB7ZG9ja2VyLmlvOiB7dXNlcm5hbWU6IDx1c2VybmFtZT4sIHBhc3N3b3JkOiA8cGFzc3dvcmQ+fX19 # REMINDER docker registry connection base64 encoded
+

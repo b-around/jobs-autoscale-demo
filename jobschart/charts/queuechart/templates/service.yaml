@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.queueService.svcName }}
+  labels:
+    {{- include "queuechart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.queueService.type }}
+  ports:
+    - name: redis
+      port: {{ .Values.queueService.port }}
+      targetPort: {{ .Values.queueService.port }}
+      protocol: TCP
+  selector:
+    {{- include "queuechart.selectorLabels" . | nindent 4 }}

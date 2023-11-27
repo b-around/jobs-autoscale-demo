@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-api-secret
+  labels:
+    {{- include "jobschart.labels" . | nindent 4 }}
+data:
+  API_TOKEN_VALUE: OTZ3OUVYZmVuMnpFSnhjZA==    # REMINDER api header access token base64 encoded
+type: Opaque
+
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-queue-secret
+  labels:
+    {{- include "jobschart.labels" . | nindent 4 }}
+data:
+  REDIS_PASSWORD: M1I4UDhyZWVRVnFUcndHVA==    # REMINDER queue server password base64 encoded
+type: Opaque
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-registry-secret
+  labels:
+    {{- include "jobschart.labels" . | nindent 4 }}
+type: docker-registry
+data:
+  .dockerconfigjson: e2F1dGhzOiB7ZG9ja2VyLmlvOiB7dXNlcm5hbWU6IDx1c2VybmFtZT4sIHBhc3N3b3JkOiA8cGFzc3dvcmQ+fX19 # REMINDER container registry connection base64 encoded
+

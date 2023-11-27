@@ -1,0 +1,37 @@
+# Default values for jobschart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+apichart:
+  enabled: True
+  debug: True
+  image:
+    repository: docker.io/azenhab/jobs-api   # REMINDER update to reflect relevant repository
+    tag: latest
+    pullPolicy: Always
+  queueService:
+    svcName: queue-svc
+    port: 6379
+
+queuechart:
+  enabled: True
+  debug: True
+  image:
+    repository: docker.io/azenhab/jobs-queue # REMINDER update to reflect relevant repository
+    tag: latest
+    pullPolicy: Always
+  queueService:
+    svcName: queue-svc
+    port: 6379
+
+
+workerchart:
+  enabled: True
+  debug: True
+  image:
+    repository: docker.io/azenhab/jobs-worker # REMINDER update to reflect relevant repository
+    tag: latest
+    pullPolicy: Always
+  queueService:
+    svcName: queue-svc
+    port: 6379

@@ -1,0 +1,80 @@
+{{- $relname := .Release.Name }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "queuechart.fullname" . }}
+  labels:
+    {{- include "queuechart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "queuechart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "queuechart.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+         - name: {{ $relname }}-registry-secret
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- range .Values.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ $relname }}-queue-pvc
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: redis
+              containerPort: {{ .Values.queueService.port }}
+              protocol: TCP
+          env:
+            - name: REDIS_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-queue-secret
+                  key: REDIS_PASSWORD
+          command: ["redis-server"] 
+          args: ["--bind", "0.0.0.0", "--requirepass", "$(REDIS_PWD)", "--loglevel", "{{ .Values.loglevel }}", "--save", " "]  # REMINDER remove --loglevel arg and configure snapshots when running in PROD
+          livenessProbe:
+            tcpSocket:
+              port: redis # named container port
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+            successThreshold: 1
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
