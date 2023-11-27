@@ -544,17 +544,28 @@ $ helm install myapp ./jobschart --dry-run --debug --namespace $OCP_PROJECT
 ```
 
 4. If the step above succeeded, proceed to install the app
-All resources will be prefixed with the chosen release name 'myapp' in the exmaple below
+All resources will be prefixed with the chosen release name, 'myapp' in the example below
 ```
 $ helm install myapp ./jobschart --debug --namespace $OCP_PROJECT
 ```
 
-5. If you want to share the helm cart you can package it using the command below
-Distribute the tgz file along with the container images
+5. (OPTIONAL) If you want to update the application following any changes to the chart values or templates run the command below
+```
+$ helm upgrade v2 . --debug --namespace $OCP_PROJECT
+```
+
+6. (OPTIONAL) If you want to remove the application run the command below
+```
+$ helm uninstall myapp --namespace $OCP_PROJECT
+```
+
+7. (OPTIONAL) If you want to share the helm cart you can package it using the command below fromt he project root directory
+Distribute the tgz file along and the container images
 ```
 $ helm package ./jobschart
 
 Successfully packaged chart and saved it to: /home/admin/workspace/jobs-autoscale-demo/jobschart-0.2.0.tgz
 ```
+
 
 
