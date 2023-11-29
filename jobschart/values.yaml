@@ -2,6 +2,21 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+
+appSettings:
+# Define the workers shared data storage size
+  appdataStorage: 10Gi
+
+# Define the api header access token in base64 encoded format
+  apiTokenValue: OTZ3OUVYZmVuMnpFSnhjZA==  
+
+# Define the queue server password in base64 encoded format
+  queuePassword: M1I4UDhyZWVRVnFUcndHVA
+
+# Define the container registry connection in base64 encoded format
+  registryCredentials: e2F1dGhzOiB7ZG9ja2VyLmlvOiB7dXNlcm5hbWU6IDx1c2VybmFtZT4sIHBhc3N3b3JkOiA8cGFzc3dvcmQ+fX19 
+  
+
 apichart:
   enabled: True
   debug: True
@@ -24,7 +39,6 @@ queuechart:
     svcName: queue-svc
     port: 6379
 
-
 workerchart:
   enabled: True
   debug: True
@@ -35,3 +49,6 @@ workerchart:
   queueService:
     svcName: queue-svc
     port: 6379
+
+
+
