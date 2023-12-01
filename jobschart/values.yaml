@@ -4,24 +4,23 @@
 
 
 appSettings:
-# Define the workers shared data storage size
+  # Define the workers shared data storage size
   appdataStorage: 10Gi
-
-# Define the api header access token in base64 encoded format
+  # Define the api header access token in base64 encoded format
   apiTokenValue: OTZ3OUVYZmVuMnpFSnhjZA==  
-
-# Define the queue server password in base64 encoded format
+  # Define the queue server password in base64 encoded format
   queuePassword: M1I4UDhyZWVRVnFUcndHVA
-
-# Define the container registry connection in base64 encoded format
+  # Define the container registry connection in base64 encoded format
   registryCredentials: e2F1dGhzOiB7ZG9ja2VyLmlvOiB7dXNlcm5hbWU6IDx1c2VybmFtZT4sIHBhc3N3b3JkOiA8cGFzc3dvcmQ+fX19 
   
 
 apichart:
   enabled: True
-  debug: True
+  appSettings:
+    debug: True
   image:
-    repository: docker.io/azenhab/jobs-api   # REMINDER update to reflect relevant repository
+# Update to reflect relevant repository
+    repository: docker.io/azenhab/jobs-api   
     tag: latest
     pullPolicy: Always
   queueService:
@@ -30,20 +29,24 @@ apichart:
 
 queuechart:
   enabled: True
-  debug: True
+  appSettings:
+    debug: True
   image:
-    repository: docker.io/azenhab/jobs-queue # REMINDER update to reflect relevant repository
+# Update to reflect relevant repository
+    repository: registry.redhat.io/rhel9/redis-7 
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   queueService:
     svcName: queue-svc
     port: 6379
 
 workerchart:
   enabled: True
-  debug: True
+  appSettings:
+    debug: True
   image:
-    repository: docker.io/azenhab/jobs-worker # REMINDER update to reflect relevant repository
+# Update to reflect relevant repository
+    repository: docker.io/azenhab/jobs-worker
     tag: latest
     pullPolicy: Always
   queueService:

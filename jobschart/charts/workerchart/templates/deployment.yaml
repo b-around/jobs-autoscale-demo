@@ -43,7 +43,7 @@ spec:
             {{- end }}
             env:
               - name: APP_DEBUG
-                value: '{{ .Values.debug }}'
+                value: '{{ .Values.appSettings.debug }}'
               - name: REDIS_URL
                 value: '{{ .Values.queueService.svcName }}.{{ .Release.Namespace }}'   # REMINDER update this URL construct if moving redis queue to another namespace
               - name: REDIS_PORT

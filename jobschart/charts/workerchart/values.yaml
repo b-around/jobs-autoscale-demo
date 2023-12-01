@@ -5,9 +5,11 @@
 nameOverride: ""
 fullnameOverride: ""
 
-# Define if extra debug information should be generated
-# Valid values are 'True | False'
-debug: False
+
+appSettings:
+  # Define if extra debug information should be generated
+  # Valid values are 'True | False'
+  debug: False
 
 
 # Define the image repository

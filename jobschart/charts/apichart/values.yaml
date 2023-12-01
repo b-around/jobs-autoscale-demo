@@ -6,13 +6,12 @@ nameOverride: ""
 fullnameOverride: ""
 
 
-# Define if extra debug information should be generated
-# Valid values are 'True | False'
-debug: False
-
-
-# Define if api should use header token to control access
-useAPIToken: True
+appSettings:
+  # Define if extra debug information should be generated
+  # Valid values are 'True | False'
+  debug: False
+  # Define if api should use header token to control access
+  useAPIToken: True
 
 
 image:

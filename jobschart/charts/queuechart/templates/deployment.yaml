@@ -49,8 +49,8 @@ spec:
                   name: {{ .Release.Name }}-queue-secret
                   key: REDIS_PASSWORD
           command: ["redis-server"] 
-          args: ["--bind", "0.0.0.0", "--requirepass", "$(REDIS_PWD)", "--loglevel", "{{ .Values.loglevel }}", "--save", " "]  # REMINDER remove --loglevel arg and configure snapshots when running in PROD
-          livenessProbe:
+          args: ["--bind", "0.0.0.0", "--requirepass", "$(REDIS_PWD)", "--loglevel", "{{ .Values.appSettings.loglevel }}", "--save", " ", "--appendonly", "{{ .Values.appSettings.logBackup }}"]
+          livenessProbe:	
             tcpSocket:
               port: redis # named container port
             initialDelaySeconds: 30

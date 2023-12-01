@@ -45,9 +45,9 @@ spec:
           {{- end }}
           env:
             - name: APP_DEBUG
-              value: '{{ .Values.debug }}'
+              value: '{{ .Values.appSettings.debug }}'
             - name: API_TOKEN
-              value: '{{ .Values.useAPIToken }}'
+              value: '{{ .Values.appSettings.useAPIToken }}'
             - name: API_TOKEN_VALUE
               valueFrom:
                 secretKeyRef:
