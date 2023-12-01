@@ -6,6 +6,9 @@ metadata:
     {{- include "jobschart.labels" . | nindent 4 }}
 spec:
   storageClassName: aws-efs
+{{- if .Values.appSettings.useStaticAppdataVolume}}
+  volumeName: {{ .Values.appSettings.staticAppdataVolumeName }} 
+{{- end }}
   accessModes:
     - ReadWriteMany
   resources:
