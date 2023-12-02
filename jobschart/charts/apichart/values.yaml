@@ -12,6 +12,8 @@ appSettings:
   debug: False
   # Define if api should use header token to control access
   useAPIToken: True
+  # Define the api token base64 encoded
+  apiTokenValue: OTZ3OUVYZmVuMnpFSnhjZA==
 
 
 image:

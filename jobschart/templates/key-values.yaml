@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "jobschart.labels" . | nindent 4 }}
 data:
-  API_TOKEN_VALUE: {{ .Values.appSettings.apiTokenValue }} 
+  API_TOKEN_VALUE: {{ .Values.apichart.appSettings.apiTokenValue }} 
 type: Opaque
 
 
@@ -17,7 +17,7 @@ metadata:
   labels:
     {{- include "jobschart.labels" . | nindent 4 }}
 data:
-  REDIS_PASSWORD: {{ .Values.appSettings.queuePassword }} 
+  REDIS_PASSWORD: {{ .Values.queuechart.appSettings.queuePassword }} 
 type: Opaque
 
 ---

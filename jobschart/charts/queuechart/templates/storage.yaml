@@ -5,7 +5,7 @@ metadata:
   labels: 
     {{- include "queuechart.labels" . | nindent 4 }}
 spec:
-  storageClassName: gp3-csi
+  storageClassName: aws-efs
   accessModes:
     - ReadWriteOnce
   resources:

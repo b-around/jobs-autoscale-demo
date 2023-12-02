@@ -1,5 +1,6 @@
 {{- $relname := .Release.Name }}
 
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,17 +28,18 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        {{- range .Values.volumes }}
-        - name: {{ .name }}
+        - name: {{ .Values.queuePersistentStorage.VolumeName }}
           persistentVolumeClaim:
             claimName: {{ $relname }}-queue-pvc
-        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+              - name: {{ .Values.queuePersistentStorage.VolumeName }}
+                mountPath: {{ .Values.queuePersistentStorage.mountPath  }}
           ports:
             - name: redis
               containerPort: {{ .Values.queueService.port }}
@@ -49,7 +51,7 @@ spec:
                   name: {{ .Release.Name }}-queue-secret
                   key: REDIS_PASSWORD
           command: ["redis-server"] 
-          args: ["--bind", "0.0.0.0", "--requirepass", "$(REDIS_PWD)", "--loglevel", "{{ .Values.appSettings.loglevel }}", "--save", " ", "--appendonly", "{{ .Values.appSettings.logBackup }}"]
+          args: ["--bind", "0.0.0.0", "--requirepass", "$(REDIS_PWD)", "--loglevel", "{{ .Values.appSettings.loglevel }}", "--dir", "{{ .Values.queuePersistentStorage.mountPath }}", "--save", " ", "--appendonly", "{{ .Values.appSettings.queueBackup }}"] 
           livenessProbe:	
             tcpSocket:
               port: redis # named container port

@@ -22,7 +22,9 @@ appSettings:
   # Data will be saved every second
   # Valid values are 'no | yes'
   # Default value is 'no' 
-  logBackup: "yes"
+  queueBackup: "no"
+  # Define the queue access password base64 encoded
+  queuePassword: M1I4UDhyZWVRVnFUcndHVA== 
 
 
 image:
@@ -34,7 +36,7 @@ image:
 
 # Define security context settings at the pod level
 podSecurityContext: {}
-  # fsGroup: 2000
+#  fsGroup: 2000
 
 
 # Define security context settings at the container level
@@ -48,11 +50,9 @@ securityContext:
     - ALL
 
 
-# Define persistent data stores for containers
-# Uses PVCs from parent chart
-volumes:
-  - name: queue-storage
-    mountPath: /var/lib/redis/data
+queuePersistentStorage:
+  VolumeName: queue-storage
+  mountPath: /redis-data
 
 
 # Define tasks queue service configurations
