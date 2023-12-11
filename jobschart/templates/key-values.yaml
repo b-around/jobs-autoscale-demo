@@ -1,24 +1,51 @@
+{{- $apisName :=  printf "%s-%s" .Release.Name "api-secret" -}}
+
+{{/* initialize the secret with the .Values content or a random string if .Values is empty */}}
+{{- $apisValue := default (randAlphaNum 30 | b64enc ) .Values.apichart.appSettings.apiTokenValue }}
+
+{{/* try to retrieve the secret data using lookup function and when not exists return an empty dictionary / map as result */}}
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace $apisName) | default dict }}
+
+{{/* if there is an existing secret update the variable to reflect that and keep it unchanged */}}
+{{- if $secretObj }}
+  {{- $apisValue := index $secretObj.data "API_TOKEN_VALUE" }}
+{{- end -}}
+
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-api-secret
+  name: {{ $apisName }}
   labels:
     {{- include "jobschart.labels" . | nindent 4 }}
 data:
-  API_TOKEN_VALUE: {{ .Values.apichart.appSettings.apiTokenValue }} 
+  API_TOKEN_VALUE: {{ $apisValue | quote }} 
 type: Opaque
 
 
 ---
+{{- $qsName :=  printf "%s-%s" .Release.Name "queue-secret" -}}
+
+{{/* initialize the secret with the .Values content or a random string if .Values is empty */}}
+{{- $qsValue := default (randAlphaNum 30 | b64enc ) .Values.queuechart.appSettings.queuePassword }}
+
+{{/* try to retrieve the secret data using lookup function and when not exists return an empty dictionary / map as result */}}
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace $qsName) | default dict }}
+
+{{/* if there is an existing secret update the variable to reflect that and keep it unchanged */}}
+{{- if $secretObj }}
+  {{- $qsValue := index $secretObj.data "REDIS_PASSWORD" }}
+{{- end -}}
+
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-queue-secret
+  name: {{ $qsName }}
   labels:
     {{- include "jobschart.labels" . | nindent 4 }}
 data:
-  REDIS_PASSWORD: {{ .Values.queuechart.appSettings.queuePassword }} 
+  REDIS_PASSWORD: {{ $qsValue | quote }} 
 type: Opaque
+
 
 ---
 apiVersion: v1

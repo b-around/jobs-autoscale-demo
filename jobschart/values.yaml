@@ -15,20 +15,24 @@ appSettings:
   # The system administrator must expose the PV to the namespace
   staticAppdataVolumeName: appdata-pv
   # Define the container registry credentials in .dockerconfigjson and base64 encoded
-  registryCredentials: 
-
+  registryCredentials: e2F1dGhzOiB7IGRvY2tlci5pbzoge3VzZXJuYW1lOiA8dXNlcm5hbWU+LCBwYXNzd29yZDogPHBhc3N3b3JkPn0sIHJlZ2lzdHJ5LnJlZGhhdC5pbzoge3VzZXJuYW1lOiA8dXNlcm5hbWU+LCBwYXNzd29yZDogPHBhc3N3b3JkPn0gfX0=
 
 apichart:
   enabled: True
   appSettings:
     debug: True
     useAPIToken: True
-    apiTokenValue: OTZ3OUVYZmVuMnpFSnhjZA==
+    # Define in base64 encoded format the queue service password which will be saved as a secret
+    # Set this paramater to empty string "" to auto-generate the password
+    # If the secret already exists, its value will never change regardless of value set here
+    # apiTokenValue: OTZ3OUVYZmVuMnpFSnhjZA==
+    apiTokenValue: ""
   image:
     # Update to reflect relevant repository
     repository: docker.io/azenhab/jobs-api   
     tag: latest
     pullPolicy: Always
+  # Define the queue service access details which should match queue chart definitions
   queueService:
     svcName: queue-svc
     port: 6379
@@ -41,7 +45,11 @@ queuechart:
   enabled: True
   appSettings:
     debug: True
-    queuePassword: 
+    # Define in base64 encoded format the queue service password which will be saved as a secret
+    # Set this paramater to empty string "" to auto-generate the password
+    # If the secret already exists, its value will never change regardless of value set here
+    # queuePassword: "M1I4UDhyZWVRVnFUcndHVA=="
+    queuePassword: ""
   image:
     # Update to reflect relevant repository
     repository: registry.redhat.io/rhel9/redis-7 
@@ -61,6 +69,7 @@ workerchart:
     repository: docker.io/azenhab/jobs-worker
     tag: latest
     pullPolicy: Always
+  # Define the queue service access details which should match queue chart definitions
   queueService:
     svcName: queue-svc
     port: 6379

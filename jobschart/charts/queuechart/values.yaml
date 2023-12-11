@@ -24,7 +24,7 @@ appSettings:
   # Default value is 'no' 
   queueBackup: "no"
   # Define the queue access password base64 encoded
-  queuePassword: M1I4UDhyZWVRVnFUcndHVA== 
+  queuePassword: "" 
 
 
 image:
