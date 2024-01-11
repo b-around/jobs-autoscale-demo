@@ -254,7 +254,7 @@ $ podman image push $C_REPO_PATH/jobs-api:latest
 ### Queue module
 1. From the queue-module root dir, build the container
 ```
-$ podman build -f Containerfile -t $C_REPO_PATH/jobs-queue:latest
+$ podman build -f queue-app/Containerfile -t $C_REPO_PATH/jobs-queue:latest
 
 STEP 1/5: FROM rhel8/redis-6
 
