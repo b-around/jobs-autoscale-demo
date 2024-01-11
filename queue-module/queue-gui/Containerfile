@@ -29,4 +29,4 @@ COPY --from=builder $HOME $HOME
 # USER 10001
 
 # Run script uses standard ways to run the application
-CMD redis-commander --http-u $USER --http-p $PASS
+CMD redis-commander --http-u $USER --http-p $PASS --redis-host $REDIS_URL --redis-port $REDIS_PORT --redis-password $REDIS_PWD
