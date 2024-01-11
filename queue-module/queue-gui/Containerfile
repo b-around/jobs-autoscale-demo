@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1
+# Builder image spec
+# More datails at https://catalog.redhat.com/software/containers/ubi9/nodejs-20-minimal/64770ddd0e699534bb564b3b?architecture=amd64&image=657162520a399224c62c1477
+FROM ubi9/nodejs-20 as builder
+
+# Add application sources
+ADD app-src $HOME
+
+# Install the dependencies
+# More details at https://www.npmjs.com/package/redis-commander
+RUN npm install -g redis-commander
+
+
+
+
+# Second stage copies the application to the minimal image
+FROM ubi9/nodejs-20-minimal
+
+LABEL org.opencontainers.image.version=0.1
+LABEL org.opencontainers.image.title="jobs autoscaler demo - gui for queue app"
+LABEL org.opencontainers.image.description="Demo app - module 2/3 that contains an optional gui for the tasks queue"
+
+# Copy the application source and build artifacts from the builder image to this one
+COPY --from=builder $HOME $HOME
+
+# DEBUG ONLY: the next block is required for dev/debug activities only and should be left commented by default
+# USER root
+# RUN yum -y install net-tools iputils
+# USER 10001
+
+# Run script uses standard ways to run the application
+CMD redis-commander --http-u $USER --http-p $PASS
